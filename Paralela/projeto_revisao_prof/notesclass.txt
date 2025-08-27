@@ -1,0 +1,3 @@
+- Recomendação do professor para vida é criar sempre um cabeçalho
+- Não fique utilizando complexidade atoa, deixe complexo 
+se necessário diminuir o tempo de execução e espaço
