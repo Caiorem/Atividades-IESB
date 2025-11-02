@@ -18,12 +18,12 @@ Este repositório está organizado por semestres e, dentro de cada semestre, por
 
 ### 6º Semestre (Atual)
 
-* **[Teoria dos Grafos]**
-    * **Pasta:** `[https://github.com/Caiorem/Atividades-IESB/tree/main/Grafos]`
+* **Teoria dos Grafos**
+    * **Pasta:** [Acessar pasta](https://github.com/Caiorem/Atividades-IESB/tree/main/Grafos)
     * **Descrição:** Desenvolvimento dos mais famosos algoritmos relacionados a grafos;
 
-* **[Programação Paralela]**
-    * **Pasta:** `[https://github.com/Caiorem/Atividades-IESB/tree/main/Paralela]`
+* **Programação Paralela**
+    * **Pasta:** [Acessar pasta](https://github.com/Caiorem/Atividades-IESB/tree/main/Paralela)
     * **Descrição:** Atividades para aplicação da teoria sobre paralelismo, em principal usando a bibliotece openMP em conjunto com C++;
 
 ---
@@ -43,4 +43,4 @@ Lista das principais tecnologias que utilizei nos projetos deste repositório:
 
 ## 📬 Contato
 
-* **LinkedIn:** `[https://br.linkedin.com/in/caiorem]`
+* **LinkedIn:** [Perfil no LinkedIn](https://br.linkedin.com/in/caiorem)
