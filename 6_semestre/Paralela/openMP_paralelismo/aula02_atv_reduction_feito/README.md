@@ -81,11 +81,12 @@ Salários por cargo:
     Financeiro	2.2×
 
 
-4° - Fazer a média, variação e após desvio padrão [NESSA ORDEM];    
-    4.1° - Calcula a media
+4° - Fazer a média, variação e após desvio padrão [NESSA ORDEM]; -> Aqui entra o omp reduction e omp lock
+    4.1° - Calcula a média
     4.2° - Calcular desvio cada ponto
+    4.3° - Calcular desvios individuais de cada salário
     4.3° - Elevar desvio de cada ponto ao quadrado
-    4.4° - Calcular variancia (Soma de desvios divido pelo total de passos)
+    4.4° - Calcular variância (Soma de desvios divido pelo total de passos)
     4.5° - Desvio padrão (Raiz do valor encontrado no passo anterior)
 
 5° - Fazer relação de custos e ganhos
