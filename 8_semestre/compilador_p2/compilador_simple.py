@@ -1308,7 +1308,7 @@ def compile_file(filepath, output=None, show_ir=False, show_asm=False, optimize=
 
     if ir_original is None:
         errors.report()
-        print("   Síntese não executada: corrija os erros acima.\n")
+        print("   Síntese não executada: corrija os erroscima.\n")
         return False
 
     if show_ir:
@@ -1325,7 +1325,7 @@ def compile_file(filepath, output=None, show_ir=False, show_asm=False, optimize=
         print()
         return False
 
-    output = output or default_output_name(filepath)
+    output = output or default_output_epath)
     generator.write_file(output)
 
     if show_asm:
@@ -1340,7 +1340,7 @@ def compile_file(filepath, output=None, show_ir=False, show_asm=False, optimize=
             print(f.read().rstrip())
         print()
 
-    print(">> STATUS: SUCESSO")
+    print(">> STATUS: SUC)
     print("   Análise léxica, sintática e semântica OK.")
     print(f"   Otimização: {'ligada' if optimize else 'desligada'}")
     print(f"   Memória usada: {len(generator.listing)} instruções + "
@@ -1354,7 +1354,7 @@ def print_usage():
 
 
 # Nosso mascote! O compilador chama Bidu, então nada mais justo que um
-# cachorrinho aparecer toda vez que alguém aperta o RUN.
+# cachorrinho aa vez que alguém aperta o RUN.
 # (raw string pra não ter que escapar as barras do desenho)
 BIDU = r"""
         / \__
@@ -1377,7 +1377,7 @@ if __name__ == '__main__':
 
     output = None
     if '-o' in args:
-        k = args.index('-o')
+      k = args.index('-o')
         if k + 1 >= len(args):
             print("Erro: '-o' precisa do nome do arquivo de saída.")
             sys.exit(1)
@@ -1392,7 +1392,7 @@ if __name__ == '__main__':
         print_usage()
         sys.exit(1)
 
-    optimize = '--no-opt' not in flags
+    omize = '--no-opt' not in flags
 
     # No --tokens o cachorro fica quieto, pra saída sair limpa no formato da disciplina
     if '--tokens' not in flags:
@@ -1406,7 +1406,7 @@ if __name__ == '__main__':
                 dump_tokens(f.read())
     elif files:
         if output and len(files) > 1:
-            print("Erro: '-o' só pode ser usado com um único arquivo.")
+            print("Erro: -o' só pode ser usado com um único arquivo.")
             sys.exit(1)
         ok = True
         for path in files:
@@ -1416,7 +1416,7 @@ if __name__ == '__main__':
         # Sem nenhum arquivo na linha de comando = botão RUN do onlineGDB.
         # Procuramos o source.txt na pasta do próprio .py (e não só na pasta
         # atual), pra funcionar mesmo se rodarem o script de outro lugar.
-        pasta = os.path.dirname(os.path.abspath(__file__))
+        pasta = os.path.dios.path.abspath(__file__))
         fonte = os.path.join(pasta, ARQUIVO_FONTE)
         if not os.path.exists(fonte) and os.path.exists(ARQUIVO_FONTE):
             pasta, fonte = '.', ARQUIVO_FONTE
@@ -1425,5 +1425,5 @@ if __name__ == '__main__':
                   f"programa SIMPLE na mesma pasta do compilador e execute de novo.")
             sys.exit(1)
         binario = output or os.path.join(pasta, ARQUIVO_BINARIO)
-        ok = compile_file(fonte, binario, '--ir' in flags, '--asm' in flags, optimize)
+        o = compile_file(fonte, binario, '--ir' in flags, '--asm' in flags, optimize)
         sys.exit(0 if ok else 1)

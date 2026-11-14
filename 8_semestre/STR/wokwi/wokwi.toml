@@ -1,0 +1,11 @@
+# Wokwi para VS Code (extensao "Wokwi Simulator").
+# Usa o diagram.json desta pasta e o firmware compilado pelo arduino-cli:
+#   arduino-cli compile -b arduino:avr:uno --output-dir ../ips_sinalizacao/build ../ips_sinalizacao
+# rfc2217ServerPort expoe a serial simulada em localhost:4000, entao a ponte
+# do PC consegue falar com a simulacao como se fosse a placa real:
+#   python ponte_pc/ponte_serial.py --porta rfc2217://localhost:4000 --beeia wss://...
+[wokwi]
+version = 1
+firmware = '../ips_sinalizacao/build/ips_sinalizacao.ino.hex'
+elf = '../ips_sinalizacao/build/ips_sinalizacao.ino.elf'
+rfc2217ServerPort = 4000

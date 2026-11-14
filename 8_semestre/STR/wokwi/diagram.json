@@ -1,0 +1,276 @@
+{
+  "version": 1,
+  "author": "Caio Silveira Guimaraes Souza",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-arduino-uno",
+      "id": "uno",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_ok",
+      "top": -150,
+      "left": 120,
+      "attrs": {
+        "color": "green",
+        "label": "OK (D8)"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_soft",
+      "top": -150,
+      "left": 190,
+      "attrs": {
+        "color": "yellow",
+        "label": "SOFT (D9)"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_hard",
+      "top": -150,
+      "left": 260,
+      "attrs": {
+        "color": "red",
+        "label": "HARD (D10)"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_miss",
+      "top": -150,
+      "left": 330,
+      "attrs": {
+        "color": "blue",
+        "label": "MISS (D11)"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_bee",
+      "top": -150,
+      "left": 50,
+      "attrs": {
+        "color": "white",
+        "label": "BEE (D7)"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_ok",
+      "top": -60,
+      "left": 100,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_soft",
+      "top": -60,
+      "left": 170,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_hard",
+      "top": -60,
+      "left": 240,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_miss",
+      "top": -60,
+      "left": 310,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_bee",
+      "top": -60,
+      "left": 30,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "bz",
+      "top": -170,
+      "left": 420,
+      "attrs": {
+        "volume": "1"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn_ack",
+      "top": 260,
+      "left": 120,
+      "attrs": {
+        "color": "red",
+        "label": "ACK (D2)"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn_stress",
+      "top": 260,
+      "left": 260,
+      "attrs": {
+        "color": "black",
+        "label": "STRESS (D3)"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "uno:8",
+      "r_ok:2",
+      "green",
+      []
+    ],
+    [
+      "r_ok:1",
+      "led_ok:A",
+      "green",
+      []
+    ],
+    [
+      "uno:9",
+      "r_soft:2",
+      "gold",
+      []
+    ],
+    [
+      "r_soft:1",
+      "led_soft:A",
+      "gold",
+      []
+    ],
+    [
+      "uno:10",
+      "r_hard:2",
+      "red",
+      []
+    ],
+    [
+      "r_hard:1",
+      "led_hard:A",
+      "red",
+      []
+    ],
+    [
+      "uno:11",
+      "r_miss:2",
+      "blue",
+      []
+    ],
+    [
+      "r_miss:1",
+      "led_miss:A",
+      "blue",
+      []
+    ],
+    [
+      "led_ok:C",
+      "uno:GND.1",
+      "black",
+      []
+    ],
+    [
+      "led_soft:C",
+      "uno:GND.1",
+      "black",
+      []
+    ],
+    [
+      "led_hard:C",
+      "uno:GND.1",
+      "black",
+      []
+    ],
+    [
+      "led_miss:C",
+      "uno:GND.1",
+      "black",
+      []
+    ],
+    [
+      "uno:12",
+      "bz:2",
+      "orange",
+      []
+    ],
+    [
+      "bz:1",
+      "uno:GND.1",
+      "black",
+      []
+    ],
+    [
+      "uno:2",
+      "btn_ack:1.l",
+      "purple",
+      []
+    ],
+    [
+      "btn_ack:2.l",
+      "uno:GND.2",
+      "black",
+      []
+    ],
+    [
+      "uno:3",
+      "btn_stress:1.l",
+      "gray",
+      []
+    ],
+    [
+      "btn_stress:2.l",
+      "uno:GND.3",
+      "black",
+      []
+    ],
+    [
+      "uno:7",
+      "r_bee:2",
+      "white",
+      []
+    ],
+    [
+      "r_bee:1",
+      "led_bee:A",
+      "white",
+      []
+    ],
+    [
+      "led_bee:C",
+      "uno:GND.1",
+      "black",
+      []
+    ]
+  ],
+  "serialMonitor": {
+    "display": "always",
+    "newline": "lf"
+  },
+  "dependencies": {}
+}
