@@ -1,77 +1,41 @@
-////////////////////////////
-Na pasta STR/do projeto:
-
-python3 -m venv .venv
-source .venv/bin/activate
-pip install pyserial "websockets>=12"
-
-
-////////////////////////////
-Teste de conexão PC API BEEAI:
-
-telnet honeypot.mirondev.com 64298      # conectou = porta liberada na AWS (Ctrl+] e "quit" para sair)
+python3 - <<'EOF'
+p='passo-passo.txt'
+s=open(p).read()
+def r(a,b):
+    global s
+    assert a in s, a[:40]
+    s=s.replace(a,b,1)
+r('''telnet honeypot.mirondev.com 64298
+export BEEAI_API_KEY
+curl''','''telnet honeypot.mirondev.com 64298      # conectou = porta liberada na AWS (Ctrl+] e "quit" para sair)
 read -s -p "Chave BeeIA: " BEEIA_API_KEY && export BEEIA_API_KEY   # cola a chave, nada aparece, Enter
-curl -H "X-API-Key: $BEEIA_API_KEY" https://honeypot.mirondev.com:64298/api/stats
-
-
-////////////////////////////
-Na pasta lab-suricata:
-docker compose up -d --build
-docker compose --profile ataque build
-docker logs -f suricata        # espere "Engine started", depois Ctrl+C
-
-Teste - SEM ARDUINO:
-
-# Terminal A
-sudo tail -f logs/eve.json | grep --line-buffered '"alert"'
-# Terminal B
-docker compose run --rm atacante hard
-
-
-
-////////////////////////////
-ETAPA APRESENTAÇÃO
-////////////////////////////
-
-Terminal 1:
+curl''')
+r('''Terminal 1:
+cat ~/Documents/Faculdade/Atividades-IESB/8_semestre/STR/passo-passo.txt
+''','''Terminal 1:
 cat ~/Documents/Faculdade/Atividades-IESB/8_semestre/STR/passo-passo.txt
 cd ~/Documents/Faculdade/Atividades-IESB/8_semestre/STR/lab-suricata
 docker compose ps        # srv-hard, srv-soft e suricata precisam estar "Up"
                          # se não estiverem: docker compose up -d
-
-
-Terminal 2:
-cd ~/Documents/Faculdade/arduino_ide
-./arduino-ide --no-sandbox
-### Abrir STR/ips_sinalizacao/ips_sinalizacao.ino
+''')
+r('''### Rodar um verifiy no código dentro do Arduino-IDE
+''','''### Abrir STR/ips_sinalizacao/ips_sinalizacao.ino
 ### Placa: Arduino Uno | Porta: /dev/ttyACM0 (ou /dev/ttyUSB0 se for clone)
 ### Verificar -> Carregar
 ### Monitor Serial (115200, Nova linha): aparece "# IPS-LED pronto", testar BEE e 1,H,teste + botão ACK
 ### FECHAR o Monitor Serial antes do Terminal 3 (senão a ponte não abre a porta)
-
-
-Terminal 3:
+''')
+r('''Terminal 3:
+source .venv/bin/activate''','''Terminal 3:
 cd ~/Documents/Faculdade/Atividades-IESB/8_semestre/STR
-source .venv/bin/activate
-read -s -p "Chave BeeIA: " BEEIA_API_KEY && export BEEIA_API_KEY   # se for terminal novo
-sudo -E .venv/bin/python ponte_pc/ponte_serial.py --porta /dev/ttyACM0 \
-     --eve lab-suricata/logs/eve.json --criticos 10.77.77.10 \
-     --beeia wss://honeypot.mirondev.com:64298/ws
-
-
-Terminal 4 - Simulação laboratorio Suricata:
+source .venv/bin/activate''')
+r('''Terminal 4 - Simulação laboratorio Suricata:
+''','''Terminal 4 - Simulação laboratorio Suricata:
 cd ~/Documents/Faculdade/Atividades-IESB/8_semestre/STR/lab-suricata
+''')
+r('''Terminal 5 - Simulação ataque BeeAI:
 
-Comando	                                ✅ No Arduino
-docker compose run --rm atacante hard	vermelho + sirene (aperte ACK)
-docker compose run --rm atacante soft	amarelo
-docker compose run --rm atacante admin	amarelo (gravidade 3 no servidor crítico)
-docker compose run --rm atacante scan	vermelho + sirene
-docker compose run --rm atacante rajada	amarelo agregado e vermelho no meio
-(esperar ataques reais na EC2)	        branco pisca a cada alerta do BeeIA
-
-
-Terminal 5 - Simulação ataque BeeAI:
+ssh root@honeypot.mirondev.com''','''Terminal 5 - Simulação ataque BeeAI:
 ### ATENÇÃO: fazer pelo 4G do celular, NÃO pela rede do notebook.
 ### Se o BeeIA bloquear o IP atacante, ele corta todo acesso desse IP à EC2
 ### e a ponte cai junto. Se acontecer: desbloquear o IP pelo dashboard.
@@ -86,4 +50,7 @@ FIM
 Ctrl+C na ponte (Terminal 3)
 cd ~/Documents/Faculdade/Atividades-IESB/8_semestre/STR/lab-suricata && docker compose down
 sudo cat ../latencias.csv      # latências HARD para o relatório
-AWS: fechar a porta 64298 (ou voltar para o IP de sempre)
+AWS: fechar a porta 64298 (ou voltar para o IP de sempre)''')
+open(p,'w').write(s)
+EOF
+echo ok
