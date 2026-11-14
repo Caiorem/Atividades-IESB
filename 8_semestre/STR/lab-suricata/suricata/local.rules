@@ -1,0 +1,14 @@
+# Regras do laboratorio. "priority" vira alert.severity no eve.json, que a
+# ponte repassa ao Arduino: 1 = alta, 2 = media, 3 = baixa.
+# Rota HARD no Arduino = destino em --criticos E severidade 1 ou 2.
+
+alert http any any -> $HOME_NET any (msg:"LAB path traversal /etc/passwd"; flow:to_server,established; http.uri; content:"/etc/passwd"; nocase; priority:1; sid:1000001; rev:1;)
+
+alert http any any -> $HOME_NET any (msg:"LAB SQL injection UNION SELECT"; flow:to_server,established; http.uri; content:"union"; nocase; content:"select"; nocase; distance:0; priority:2; sid:1000002; rev:1;)
+
+alert http any any -> $HOME_NET any (msg:"LAB acesso ao painel /admin"; flow:to_server,established; http.uri; content:"/admin"; nocase; priority:3; sid:1000003; rev:1;)
+
+alert icmp any any -> $HOME_NET any (msg:"LAB ping (ICMP echo request)"; itype:8; priority:3; sid:1000004; rev:1;)
+
+# Varredura: 20 SYN do mesmo IP em 10 s; "both" gera um unico alerta por janela.
+alert tcp any any -> $HOME_NET any (msg:"LAB varredura de portas"; flags:S,12; threshold:type both, track by_src, count 20, seconds 10; priority:2; sid:1000005; rev:1;)

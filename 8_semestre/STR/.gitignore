@@ -1,1 +1,5 @@
 ./tpotce-TCC
+__pycache__/
+.venv/
+latencias.csv
+ips_sinalizacao/build/

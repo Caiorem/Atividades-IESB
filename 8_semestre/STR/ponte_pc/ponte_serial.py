@@ -125,23 +125,46 @@ def modo_stress(p, n):
 
 def modo_eve(p, caminho, criticos):
     """Acompanha o eve.json do Suricata e encaminha apenas eventos 'alert'."""
-    with open(caminho) as f:
-        f.seek(0, os.SEEK_END)
-        while True:
-            linha = f.readline()
-            if not linha:
-                time.sleep(0.005)
-                continue
+    if not os.path.exists(caminho):
+        print(f"# aguardando {caminho} (o Suricata ja subiu?)")
+        while not os.path.exists(caminho):
+            time.sleep(0.5)
+    print(f"# Suricata: lendo {caminho}  criticos={sorted(criticos) or 'nenhum'}")
+    f = open(caminho)
+    f.seek(0, os.SEEK_END)
+    pendente = ""
+    while True:
+        pedaco = f.readline()
+        if not pedaco:
+            # Arquivo recriado (container reiniciado, logs apagados): reabre do inicio.
             try:
-                ev = json.loads(linha)
-            except json.JSONDecodeError:
-                continue
-            if ev.get("event_type") != "alert":
-                continue
-            sev = ev.get("alert", {}).get("severity", 3)
-            destino = ev.get("dest_ip", "")
-            classe = "H" if destino in criticos else "S"
-            p.enviar(sev, classe, ev.get("src_ip", "?"))
+                if os.stat(caminho).st_ino != os.fstat(f.fileno()).st_ino \
+                        or os.path.getsize(caminho) < f.tell():
+                    f.close()
+                    f = open(caminho)
+                    pendente = ""
+                    print("# eve.json recriado; reaberto")
+            except FileNotFoundError:
+                pass
+            time.sleep(0.005)
+            continue
+        # O Suricata pode estar no meio da escrita: so processa linhas completas.
+        pendente += pedaco
+        if not pendente.endswith("\n"):
+            continue
+        linha, pendente = pendente, ""
+        try:
+            ev = json.loads(linha)
+        except json.JSONDecodeError:
+            continue
+        if ev.get("event_type") != "alert":
+            continue
+        sev = ev.get("alert", {}).get("severity", 3)
+        destino = ev.get("dest_ip", "")
+        classe = "H" if destino in criticos else "S"
+        print(f"-> {sev},{classe},{ev.get('src_ip', '?')}  (Suricata: "
+              f"{ev.get('alert', {}).get('signature', '?')} -> {destino})")
+        p.enviar(sev, classe, ev.get("src_ip", "?"))
 
 
 # ------------------------------------------------------------ BeeIA (TCC)

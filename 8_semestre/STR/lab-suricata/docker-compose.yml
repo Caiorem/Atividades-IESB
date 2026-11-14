@@ -1,0 +1,65 @@
+# Laboratorio do IPS (Sistemas de Tempo Real - IESB)
+#
+#   srv-hard  10.77.77.10  servidor critico  -> alertas sev 1-2 viram HARD no Arduino
+#   srv-soft  10.77.77.20  servidor comum    -> todos os alertas viram SOFT
+#   atacante  10.77.77.66  gera trafego malicioso sob demanda (docker compose run)
+#   suricata  rede do host, escutando a bridge br-lab; grava logs/eve.json
+#
+# Subir:   docker compose up -d --build
+# Atacar:  docker compose run --rm atacante hard      (ver atacante/ataque.sh)
+# Ponte:   ver README.md desta pasta
+
+name: lab-ips
+
+networks:
+  labnet:
+    driver: bridge
+    driver_opts:
+      # Nome fixo da interface no host: e nela que o Suricata escuta.
+      com.docker.network.bridge.name: br-lab
+    ipam:
+      config:
+        - subnet: 10.77.77.0/24
+          gateway: 10.77.77.1
+
+services:
+  srv-hard:
+    build: ./servidor
+    container_name: srv-hard
+    hostname: srv-hard
+    environment:
+      NOME: "SERVIDOR HARD (critico)"
+    networks:
+      labnet:
+        ipv4_address: 10.77.77.10
+    restart: unless-stopped
+
+  srv-soft:
+    build: ./servidor
+    container_name: srv-soft
+    hostname: srv-soft
+    environment:
+      NOME: "SERVIDOR SOFT (comum)"
+    networks:
+      labnet:
+        ipv4_address: 10.77.77.20
+    restart: unless-stopped
+
+  suricata:
+    build: ./suricata
+    container_name: suricata
+    # Rede do host: assim o container enxerga a interface br-lab da bridge
+    # e todo o trafego entre os containers do laboratorio.
+    network_mode: host
+    cap_add: [NET_ADMIN, NET_RAW, SYS_NICE]
+    volumes:
+      - ./logs:/var/log/suricata
+    depends_on: [srv-hard, srv-soft]   # garante a br-lab ativa antes de escutar
+    restart: unless-stopped
+
+  atacante:
+    build: ./atacante
+    networks:
+      labnet:
+        ipv4_address: 10.77.77.66
+    profiles: [ataque]   # nao sobe no "up"; so com "docker compose run atacante ..."

@@ -7,6 +7,7 @@ lab/
 ├── ips_sinalizacao/ips_sinalizacao.ino   ← abrir na IDE do Arduino (etapa 3)
 ├── wokwi/sketch.ino, diagram.json, libraries.txt   ← colar no wokwi.com (etapa 1)
 ├── wokwi/wokwi.toml                      ← Wokwi no VS Code + ponte ligada à simulação (etapa 4)
+├── lab-suricata/                         ← laboratório em containers: srv-hard, srv-soft, atacante, Suricata
 └── ponte_pc/ponte_serial.py              ← PC → Arduino (demo, stress, Suricata, BeeIA/TCC)
 ```
 
@@ -144,7 +145,7 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install pyserial "websockets>=12"
 read -s -p "Chave BeeIA: " BEEIA_API_KEY && export BEEIA_API_KEY
 sudo -E .venv/bin/python ponte_pc/ponte_serial.py --porta /dev/ttyACM0 \
-     --eve /var/log/suricata/eve.json --criticos 10.0.0.10,10.0.0.11 \
+     --eve lab-suricata/logs/eve.json --criticos 10.77.77.10 \
      --beeia wss://honeypot.mirondev.com:64298/ws
 ```
 
@@ -157,7 +158,8 @@ Pré-requisitos:
   (o da faculdade é diferente do seu). Libere temporariamente e feche depois da apresentação.
 - Porta serial no Ubuntu: `sudo usermod -aG dialout $USER` (sair e entrar na sessão) e,
   para Arduino clone (CH340), `sudo apt remove brltty`.
-- Alerta de teste do Suricata: `curl http://testmynids.org/uid/index.html`.
+- O laboratório do Suricata (servidores, atacante e roteiro de ataques) está em
+  [lab-suricata/README.md](lab-suricata/README.md).
 - A chave vai no header `X-API-Key` (lida de `BEEIA_API_KEY`), nunca na URL nem no código.
 
 ### Testar com a simulação (sem placa), no VS Code
