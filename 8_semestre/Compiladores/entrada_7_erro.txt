@@ -1,0 +1,5 @@
+10 input a
+20 input b
+40 print a
+35 let c = a + b
+99 end
