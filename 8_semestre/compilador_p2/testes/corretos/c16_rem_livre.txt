@@ -1,0 +1,4 @@
+10 rem Programa DE Teste: (qualquer coisa) #1 @ $ ; vale no rem
+20 input a
+30 print a
+40 end

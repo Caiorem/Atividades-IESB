@@ -1,0 +1,4 @@
+10 rem variaveis comecam valendo zero
+20 let x = y + 1
+30 print x
+40 end

@@ -1,0 +1,4 @@
+10 input a
+20 goto
+30 print a
+99 end

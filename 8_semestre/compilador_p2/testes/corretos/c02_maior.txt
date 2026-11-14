@@ -1,0 +1,8 @@
+10 rem imprime o maior de dois numeros
+20 input a
+30 input b
+40 if a >= b goto 70
+50 print b
+60 goto 99
+70 print a
+99 end

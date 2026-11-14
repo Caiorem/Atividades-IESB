@@ -15,6 +15,7 @@ Fases:
 A síntese só é executada se a análise não encontrar nenhuma inconsistência.
 
 Uso:
+    python compilador_simple.py                            -> lê source.txt e gera binary.txt
     python compilador_simple.py prog.simple                -> gera prog.sml
     python compilador_simple.py prog.simple -o saida.sml   -> nome de saída explícito
     python compilador_simple.py prog.simple --ir           -> mostra o código intermediário
@@ -22,12 +23,10 @@ Uso:
     python compilador_simple.py prog.simple --asm          -> mostra a listagem SML comentada
     python compilador_simple.py prog.simple --no-opt       -> desliga todas as otimizações
     python compilador_simple.py prog.simple --tokens       -> fluxo de tokens (formato da disciplina)
-    python compilador_simple.py                            -> compila todos os *.txt da pasta
 """
 
 import os
 import sys
-import glob
 
 KEYWORDS = {'rem', 'input', 'let', 'print', 'goto', 'if', 'end'}
 ARITH_OPS = {'+', '-', '*', '/', '%'}
@@ -1261,6 +1260,12 @@ def dump_tokens(raw_code):
 # 8. DRIVER DO COMPILADOR
 # ==========================================
 
+# Nomes que o professor pediu: ele coloca o programa SIMPLE no source.txt,
+# aperta RUN e o compilador tem que gerar o binary.txt na mesma pasta.
+ARQUIVO_FONTE = 'source.txt'
+ARQUIVO_BINARIO = 'binary.txt'
+
+
 def default_output_name(filepath):
     return os.path.splitext(filepath)[0] + '.sml'
 
@@ -1327,6 +1332,13 @@ def compile_file(filepath, output=None, show_ir=False, show_asm=False, optimize=
         print("--- Código SML ---")
         generator.print_listing()
         print()
+    else:
+        # Mostra também no console o que foi gravado no arquivo, assim dá pra
+        # conferir (ou copiar) o código objeto direto na tela do onlineGDB.
+        print(f"--- Conteúdo de {os.path.basename(output)} ---")
+        with open(output, 'r', encoding='utf-8') as f:
+            print(f.read().rstrip())
+        print()
 
     print(">> STATUS: SUCESSO")
     print("   Análise léxica, sintática e semântica OK.")
@@ -1339,6 +1351,22 @@ def compile_file(filepath, output=None, show_ir=False, show_asm=False, optimize=
 
 def print_usage():
     print(__doc__)
+
+
+# Nosso mascote! O compilador chama Bidu, então nada mais justo que um
+# cachorrinho aparecer toda vez que alguém aperta o RUN.
+# (raw string pra não ter que escapar as barras do desenho)
+BIDU = r"""
+        / \__
+       (    @\___       Au au! Compilador Bidu
+       /         O      SIMPLE  ->  Simpletron (SML)
+      /   (_____/       Caio Silveira & Mayron Malaquias
+     /_____/   U
+"""
+
+
+def print_banner():
+    print(BIDU)
 
 
 if __name__ == '__main__':
@@ -1366,6 +1394,10 @@ if __name__ == '__main__':
 
     optimize = '--no-opt' not in flags
 
+    # No --tokens o cachorro fica quieto, pra saída sair limpa no formato da disciplina
+    if '--tokens' not in flags:
+        print_banner()
+
     if '--tokens' in flags:
         if not files:
             print("Informe um arquivo: python compilador_simple.py arquivo.simple --tokens")
@@ -1381,11 +1413,17 @@ if __name__ == '__main__':
             ok = compile_file(path, output, '--ir' in flags, '--asm' in flags, optimize) and ok
         sys.exit(0 if ok else 1)
     else:
-        txt_files = sorted(glob.glob("*.txt"))
-        if not txt_files:
-            print("Nenhum arquivo .txt encontrado no diretório atual e "
-                  "nenhum arquivo foi passado como argumento!")
-        else:
-            print(f"Iniciando compilação de {len(txt_files)} arquivo(s) de teste...\n")
-            for f in txt_files:
-                compile_file(f, None, '--ir' in flags, '--asm' in flags, optimize)
+        # Sem nenhum arquivo na linha de comando = botão RUN do onlineGDB.
+        # Procuramos o source.txt na pasta do próprio .py (e não só na pasta
+        # atual), pra funcionar mesmo se rodarem o script de outro lugar.
+        pasta = os.path.dirname(os.path.abspath(__file__))
+        fonte = os.path.join(pasta, ARQUIVO_FONTE)
+        if not os.path.exists(fonte) and os.path.exists(ARQUIVO_FONTE):
+            pasta, fonte = '.', ARQUIVO_FONTE
+        if not os.path.exists(fonte):
+            print(f"Arquivo '{ARQUIVO_FONTE}' não encontrado. Crie o {ARQUIVO_FONTE} com o "
+                  f"programa SIMPLE na mesma pasta do compilador e execute de novo.")
+            sys.exit(1)
+        binario = output or os.path.join(pasta, ARQUIVO_BINARIO)
+        ok = compile_file(fonte, binario, '--ir' in flags, '--asm' in flags, optimize)
+        sys.exit(0 if ok else 1)

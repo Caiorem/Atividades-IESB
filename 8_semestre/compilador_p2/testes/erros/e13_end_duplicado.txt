@@ -1,0 +1,4 @@
+10 input a
+20 end
+30 print a
+40 end

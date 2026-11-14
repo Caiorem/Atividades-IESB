@@ -1,0 +1,13 @@
+10 rem precedencia e associatividade a esquerda
+20 input a
+30 input b
+40 input c
+50 let x = a + b * c
+55 print x
+60 let y = a - b - c
+65 print y
+70 let z = a * b / c
+75 print z
+80 let w = a + b * c - a / b % c
+85 print w
+99 end

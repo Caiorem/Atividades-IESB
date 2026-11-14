@@ -1,0 +1,6 @@
+10   input   a
+
+20 let b=a*2
+   
+30	print b
+40 end

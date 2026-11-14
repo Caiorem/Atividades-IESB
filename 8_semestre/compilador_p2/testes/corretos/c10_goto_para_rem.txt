@@ -1,0 +1,9 @@
+10 rem contagem regressiva com desvios para linhas rem
+20 input n
+30 rem inicio do laco
+40 if n == 0 goto 80
+50 print n
+60 let n = n - 1
+70 goto 30
+80 rem fim
+90 end

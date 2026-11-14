@@ -1,0 +1,4 @@
+10 input n
+20 x = 5
+35 ef n == 0 goto 10
+99 end

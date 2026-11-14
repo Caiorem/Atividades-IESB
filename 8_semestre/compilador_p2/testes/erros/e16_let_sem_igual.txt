@@ -1,0 +1,4 @@
+10 input a
+20 let x a + 1
+30 print x
+40 end

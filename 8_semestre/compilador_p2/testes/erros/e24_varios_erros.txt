@@ -1,0 +1,6 @@
+10 input A
+20 let soma = a + b
+30 if a > b 50
+25 print a
+40 goto 99
+50 end

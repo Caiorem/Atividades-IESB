@@ -1,0 +1,11 @@
+10 input n
+20 let a = 0
+30 let b = 1
+40 if n <= 0 goto 99
+50 print a
+60 let t = a + b
+70 let a = b
+80 let b = t
+90 let n = n - 1
+95 goto 40
+99 end

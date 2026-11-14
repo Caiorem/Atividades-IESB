@@ -1,0 +1,9 @@
+10 input b
+20 input e
+30 let r = 1
+40 if e <= 0 goto 80
+50 let r = r * b
+60 let e = e - 1
+70 goto 40
+80 print r
+90 end

@@ -1,0 +1,5 @@
+10 input x
+20 if x >= 0 goto 40
+30 let x = 0 - x
+40 print x
+50 end

@@ -1,0 +1,5 @@
+10 rem compila, mas o simpletron deve abortar na execucao
+20 input a
+30 let x = a / 0
+40 print x
+50 end

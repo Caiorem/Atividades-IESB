@@ -1,0 +1,14 @@
+10 let a = -5
+20 let b = 3 - -2
+30 print a
+40 print b
+50 if a < -1 goto 80
+60 let c = 0
+70 goto 90
+80 let c = 1
+90 print c
+92 let d = -7 / 2
+94 print d
+96 let e = -7 % 2
+98 print e
+99 end

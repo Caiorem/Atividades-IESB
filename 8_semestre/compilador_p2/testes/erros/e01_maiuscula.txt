@@ -1,0 +1,4 @@
+10 input n
+13 let C = 22
+20 print n
+99 end

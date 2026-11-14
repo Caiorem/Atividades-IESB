@@ -1,0 +1,7 @@
+10 input a
+20 input b
+30 let r = a % b
+40 print r
+50 let q = a / b
+60 print q
+70 end
