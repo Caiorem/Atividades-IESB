@@ -1,1 +1,0 @@
-Colocar o PDF falando quais partes do código foram paralelizadas e por quê?
