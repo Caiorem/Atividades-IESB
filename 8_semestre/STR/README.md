@@ -7,6 +7,7 @@ lab/
 ├── ips_sinalizacao/ips_sinalizacao.ino   ← abrir na IDE do Arduino (etapa 3)
 ├── wokwi/sketch.ino, diagram.json, libraries.txt   ← colar no wokwi.com (etapa 1)
 ├── wokwi/wokwi.toml                      ← Wokwi no VS Code + ponte ligada à simulação (etapa 4)
+├── passo-passo.md                        ← roteiro de execução e apresentação no notebook
 ├── lab-suricata/                         ← laboratório em containers: srv-hard, srv-soft, atacante, Suricata
 └── ponte_pc/ponte_serial.py              ← PC → Arduino (demo, stress, Suricata, BeeIA/TCC)
 ```
