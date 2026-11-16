@@ -122,7 +122,6 @@ Digite qualquer coisa (`ls`, `whoami`) e saia. O branco pisca quando a sessão f
 ```bash
 # Ctrl+C na ponte (Terminal 3)
 cd $STR/lab-suricata && docker compose down
-sudo cat ../latencias.csv      # latências HARD para o relatório
 ```
 
 Na AWS: fechar a porta 64298, ou voltar a regra para o IP de sempre.
