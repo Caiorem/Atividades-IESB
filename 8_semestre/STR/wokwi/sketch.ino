@@ -18,7 +18,8 @@
  * Comandos: ACK        -> reconhece o alarme critico (mesmo que o botao)
  *           STRESS,<n> -> injeta n alertas sinteticos (teste de carga)
  *           STATS      -> imprime estatisticas e pilha livre das tarefas
- *           BEE        -> novo alerta do BeeIA (TCC): pisca o LED branco
+ *           BEE        -> novo alerta do BeeIA (TCC): pisca o LED branco e
+ *                         zumbe como uma abelha (se a sirene nao estiver ativa)
  *
  * Saidas no monitor serial (CSV, para analise posterior):
  *   HARD,<id>,<latencia_us>,<OK|MISS>
@@ -30,6 +31,7 @@
  *   AGG  (1) agrega alertas soft numa janela e acende o LED amarelo
  *   Timer one-shot (200 ms): apaga o LED branco do BeeIA
  *   Timer periodico (90 ms): sirene de dois tons ate o ACK
+ *   Timer periodico (~30 ms): zumbido de abelha do BeeIA (cede a sirene)
  *   Timer de software (500 ms): heartbeat verde, leitura do botao de
  *            stress (avisa a RX) e apagamento do amarelo
  */
@@ -54,8 +56,19 @@ const uint16_t PISCA_BEE_MS  = 200; // duracao da piscada do LED branco
 // ACK (alarme "travado", como num painel de seguranca). A pausa faz um buzzer
 // ATIVO (que ignora a frequencia) bipar em vez de dar um tom continuo.
 const uint16_t FASE_SIRENE_MS = 90;
-const uint16_t SIRENE_HZ[]    = { 3200, 1600, 3200, 1600, 3200, 1600, 0 };
+// As tabelas de tons ficam na flash (PROGMEM): no AVR um array "const" comum
+// ocuparia RAM, e o Uno so tem 2 KB. Leitura com pgm_read_word().
+const uint16_t SIRENE_HZ[] PROGMEM = { 3200, 1600, 3200, 1600, 3200, 1600, 0 };
 const uint8_t  N_FASES_SIRENE = sizeof(SIRENE_HZ) / sizeof(SIRENE_HZ[0]);
+
+// Zumbido do BeeIA: tons graves (180-260 Hz) trocando rapido, o que soa como
+// o "bzzz" de uma abelha passando. O buzzer e compartilhado: a sirene do
+// alerta HARD tem prioridade, entao o zumbido nao toca (ou para no meio)
+// enquanto a sirene estiver ativa. O LED branco pisca de qualquer jeito.
+const uint16_t FASE_ZUMBIDO_MS = 30;   // 2 ticks do FreeRTOS no AVR
+const uint16_t ZUMBIDO_HZ[] PROGMEM = { 180, 230, 200, 260, 190, 240,
+                                        210, 250, 195, 235, 185, 220 };
+const uint8_t  N_FASES_ZUMBIDO = sizeof(ZUMBIDO_HZ) / sizeof(ZUMBIDO_HZ[0]);
 
 // --------------------------------------------- Parametros de tempo real
 const uint32_t DEADLINE_HARD_US = 50000UL; // 50 ms: leitura -> LED vermelho
@@ -83,6 +96,8 @@ TaskHandle_t      hCrit, hRx, hAgg;
 TimerHandle_t     tmBee;           // one-shot: apaga o LED branco
 TimerHandle_t     tmSirene;        // periodico: alterna os tons da sirene
 volatile bool     sireneAtiva = false;
+TimerHandle_t     tmZumbido;       // periodico: fases do zumbido da abelha
+volatile uint8_t  faseZumbido = 0; // 0 = parado; 1..N = proxima fase
 
 // --------------------------------------------------------- Estatisticas
 volatile uint16_t nRecebidos = 0, nHard = 0, nSoft = 0;
@@ -98,6 +113,7 @@ void tarefaAgregador(void *p);
 void timerMonitor(TimerHandle_t t);
 void timerApagaBee(TimerHandle_t t);
 void timerSirene(TimerHandle_t t);
+void timerZumbido(TimerHandle_t t);
 void isrAck();
 void enfileirarAlerta(uint8_t sev, char classe);
 void gerarStress(uint16_t n);
@@ -131,10 +147,11 @@ void setup() {
   if (tm != NULL) xTimerStart(tm, 0);
   tmBee = xTimerCreate("BEE", pdMS_TO_TICKS(PISCA_BEE_MS), pdFALSE, NULL, timerApagaBee);
   tmSirene = xTimerCreate("SIR", pdMS_TO_TICKS(FASE_SIRENE_MS), pdTRUE, NULL, timerSirene);
+  tmZumbido = xTimerCreate("ZUM", pdMS_TO_TICKS(FASE_ZUMBIDO_MS), pdTRUE, NULL, timerZumbido);
 
   attachInterrupt(digitalPinToInterrupt(PIN_BTN_ACK), isrAck, FALLING);
 
-  if (!ok || !qHard || !qSoft || !mtxSerial || !tm || !tmBee || !tmSirene) {
+  if (!ok || !qHard || !qSoft || !mtxSerial || !tm || !tmBee || !tmSirene || !tmZumbido) {
     Serial.println(F("# ERRO: memoria insuficiente para criar os objetos"));
   }
   Serial.println(F("# IPS-LED pronto. Formato: sev,classe,origem (ex.: 1,H,10.0.0.66)"));
@@ -188,6 +205,13 @@ void tarefaRx(void *p) {
         // que o apaga sozinho. Alertas seguidos estendem a piscada.
         digitalWrite(PIN_LED_BEE, HIGH);
         xTimerReset(tmBee, 0);
+        // Zumbido so se a sirene nao estiver tocando. Secao critica curta:
+        // sem ela, a CRIT poderia ligar a sirene entre o teste e o tone().
+        taskENTER_CRITICAL();
+        bool zumbir = !sireneAtiva;
+        if (zumbir) { faseZumbido = 1; tone(PIN_BUZZER, pgm_read_word(&ZUMBIDO_HZ[0])); }
+        taskEXIT_CRITICAL();
+        if (zumbir) xTimerReset(tmZumbido, 0);
         nBee++;
         if (xSemaphoreTake(mtxSerial, pdMS_TO_TICKS(50)) == pdTRUE) {
           Serial.print(F("BEE,")); Serial.println(nBee);
@@ -258,7 +282,7 @@ void tarefaCritica(void *p) {
     digitalWrite(PIN_LED_HARD, HIGH);
     if (!sireneAtiva) {             // 1o tom ja aqui; o timer cuida do resto
       sireneAtiva = true;
-      tone(PIN_BUZZER, SIRENE_HZ[0]);
+      tone(PIN_BUZZER, pgm_read_word(&SIRENE_HZ[0]));
       xTimerStart(tmSirene, 0);
     }
     uint32_t lat = micros() - e.t;
@@ -370,6 +394,25 @@ void timerSirene(TimerHandle_t t) {
   static uint8_t fase = 0;
   if (!sireneAtiva) { noTone(PIN_BUZZER); fase = 0; return; }
   fase = (fase + 1) % N_FASES_SIRENE;
-  if (SIRENE_HZ[fase]) tone(PIN_BUZZER, SIRENE_HZ[fase]);
-  else                 noTone(PIN_BUZZER);
+  uint16_t hz = pgm_read_word(&SIRENE_HZ[fase]);
+  if (hz) tone(PIN_BUZZER, hz);
+  else    noTone(PIN_BUZZER);
+}
+
+// ===================== Timer periodico do zumbido do BeeIA (~30 ms/fase)
+// Roda no daemon de timers (como a sirene, entao os dois nunca executam ao
+// mesmo tempo). Se a sirene assumiu o buzzer, sai sem tocar nele.
+void timerZumbido(TimerHandle_t t) {
+  if (sireneAtiva || faseZumbido == 0) {   // sirene manda no buzzer
+    faseZumbido = 0;
+    xTimerStop(t, 0);
+    return;
+  }
+  if (faseZumbido >= N_FASES_ZUMBIDO) {    // fim do "bzzz"
+    noTone(PIN_BUZZER);
+    faseZumbido = 0;
+    xTimerStop(t, 0);
+    return;
+  }
+  tone(PIN_BUZZER, pgm_read_word(&ZUMBIDO_HZ[faseZumbido++]));
 }

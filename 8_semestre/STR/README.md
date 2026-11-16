@@ -36,7 +36,7 @@ roteiro de testes do item 3.4 — todos os alertas críticos ficaram dentro do d
 | `3,S,10.0.0.70` (e mais 2 ou 3 linhas S logo em seguida) | ~1 s depois o amarelo acende **uma vez só**. Serial: `SOFT,<qtd>,<sev>,~992,OK` |
 | Botão vermelho (ACK) ou `ACK` | Sirene para; vermelho e azul apagam |
 | `STRESS,50` ou botão preto | 10 linhas `HARD` seguidas, todas `OK`; depois um `SOFT,10,...` |
-| `BEE` | LED branco pisca ~200 ms (timer one-shot). Serial: `BEE,<contador>` |
+| `BEE` | LED branco pisca ~200 ms e zumbido de abelha (mudo se a sirene estiver tocando). Serial: `BEE,<contador>` |
 | `STATS` | Contadores, latência máxima, `bee=` e pilha livre de cada tarefa |
 
 O amarelo apaga sozinho após 5 s sem alertas soft. O azul só acende se algum alerta
@@ -135,7 +135,7 @@ Cada fonte tem os seus LEDs:
 
 | Fonte | Evento | Linha enviada | LED |
 |---|---|---|---|
-| BeeIA (EC2) | todo `new_attack`, de qualquer tipo | `BEE` | branco pisca ~200 ms |
+| BeeIA (EC2) | todo `new_attack`, de qualquer tipo | `BEE` | branco pisca ~200 ms + zumbido de abelha |
 | Suricata (local) | `alert` com destino em `--criticos` e severidade 1–2 | `<sev>,H,<ip>` | vermelho + buzzer (HARD, 50 ms) |
 | Suricata (local) | qualquer outro `alert` | `<sev>,S,<ip>` | amarelo agregado (SOFT) |
 
