@@ -1,7 +1,5 @@
 # Passo a passo de execução — IPS com Arduino + FreeRTOS
 
-Roteiro para rodar no notebook Ubuntu. Caminho base usado nos comandos:
-
 ```bash
 STR=~/Documents/Faculdade/Atividades-IESB/8_semestre/STR
 ```
@@ -123,5 +121,3 @@ Digite qualquer coisa (`ls`, `whoami`) e saia. O branco pisca quando a sessão f
 # Ctrl+C na ponte (Terminal 3)
 cd $STR/lab-suricata && docker compose down
 ```
-
-Na AWS: fechar a porta 64298, ou voltar a regra para o IP de sempre.
